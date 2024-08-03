@@ -1,0 +1,4 @@
+1. Email should be unique.
+2. user have roles
+3. Verification link will be sent in email
+4. 
