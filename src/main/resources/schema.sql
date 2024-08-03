@@ -43,7 +43,7 @@ CREATE TABLE Roles
 (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name       VARCHAR(50) NOT NULL,
-    permission VARCHAR(255) NOT NULL,
+    permissions VARCHAR(255) NOT NULL,
     CONSTRAINT UQ_Roles_Name UNIQUE (name)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

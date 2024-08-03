@@ -1,16 +1,14 @@
 package io.getarrays.securecapita.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -18,6 +16,8 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Data
+@Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,11 +33,12 @@ public class User {
     private String email;
     @NotEmpty(message="password cannot be empty")
     private String password;
-    private Boolean enabled;
+    @Column(nullable = false)
+    private Boolean enabled=true;
     private String title;
     private String bio;
     private String imageUrl;
     private Boolean nonLocked;
     private Boolean mfaEnabled;
-    private LocalDateTime createdOn;
+    private LocalDateTime createdOn = LocalDateTime.now();;
 }
