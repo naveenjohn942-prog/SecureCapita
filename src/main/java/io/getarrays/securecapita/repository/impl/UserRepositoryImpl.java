@@ -31,6 +31,7 @@ import java.util.*;
 import static io.getarrays.securecapita.enumeration.RoleType.ROLE_USER;
 import static io.getarrays.securecapita.enumeration.VerificationType.ACCOUNT;
 import static io.getarrays.securecapita.query.UserQuery.*;
+import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.time.DateUtils.addDays;
 
@@ -149,7 +150,26 @@ public class UserRepositoryImpl implements UserRepository<User>, UserDetailsServ
             jdbc.update(DELETE_VERIFICATION_CODE_BY_USER_ID, Map.of("id", user.getId()));
             jdbc.update(INSERT_VERIFICATION_CODE_QUERY, Map.of("userId", user.getId(),"code", verificationCode,"expDate", expirationDate));
 //            sendSMS(user.getPhone(),"From: SecureCapita \nVerification Code\n+verificationCode");
+            log.info("Verification code sent:{}", verificationCode);
         } catch (Exception e) {
+            throw new ApiException("An error occurred.");
+        }
+    }
+
+    @Override
+    public User verifyCode(String email, String code) {
+        try {
+            User userByCode = jdbc.queryForObject(SELECT_USER_BY_USER_CODE_QUERY, Map.of("code", code), new UserRowMapper());
+            User userByEmail = jdbc.queryForObject(SELECT_USER_BY_EMAIL_QUERY, Map.of("email", email), new UserRowMapper());
+            if(userByCode.getEmail().equalsIgnoreCase(userByEmail.getEmail())) {
+                jdbc.update(DELETE_VERIFICATION_CODE_BY_USER_ID_AND_CODE, Map.of("userId", userByCode.getId(), "code", code));
+                return userByCode;
+            }else {
+                throw new ApiException("User not found with email: " + email);
+            }
+        }catch (EmptyResultDataAccessException e) {
+            throw new ApiException("User not found with email: " + email);
+        }catch (Exception e) {
             throw new ApiException("An error occurred.");
         }
     }

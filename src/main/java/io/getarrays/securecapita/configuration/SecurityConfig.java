@@ -31,7 +31,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final String[] PUBLIC_URLS = {"/user/login/**", "/user/register/**"};
+    private static final String[] PUBLIC_URLS = {"/user/login/**", "/user/register/**","/user/verify/code/**"};
     private final BCryptPasswordEncoder encoder;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -39,32 +39,32 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .cors(configure -> configure.configurationSource(corsConfigurationSource()))
-//                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-//                .exceptionHandling(exception ->
-//                        exception.accessDeniedHandler(customAccessDeniedHandler)
-//                                .authenticationEntryPoint(customAuthenticationEntryPoint))
-//                .authorizeHttpRequests(request ->
-//                        request.requestMatchers(PUBLIC_URLS).permitAll()
-//                                .requestMatchers(OPTIONS).permitAll()
-//                                .requestMatchers(DELETE, "/user/delete/**")
-//                                .hasAnyAuthority("DELETE:USER")
-//                                .requestMatchers(DELETE, "/customer/delete/**")
-//                                .hasAnyAuthority("DELETE:CUSTOMER")
-//                                .anyRequest().authenticated())
-//                .exceptionHandling(exception ->
-//                        exception.accessDeniedHandler(customAccessDeniedHandler)
-//                                .authenticationEntryPoint(customAuthenticationEntryPoint));
-//        return http.build();
         http
-                .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF protection
-                .cors(configure -> configure.configurationSource(corsConfigurationSource()))  // Configure CORS (optional)
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(configure -> configure.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+                .exceptionHandling(exception ->
+                        exception.accessDeniedHandler(customAccessDeniedHandler)
+                                .authenticationEntryPoint(customAuthenticationEntryPoint))
                 .authorizeHttpRequests(request ->
-                        request.anyRequest().permitAll()  // Allow all requests
-                );
+                        request.requestMatchers(PUBLIC_URLS).permitAll()
+                                .requestMatchers(OPTIONS).permitAll()
+                                .requestMatchers(DELETE, "/user/delete/**")
+                                .hasAnyAuthority("DELETE:USER")
+                                .requestMatchers(DELETE, "/customer/delete/**")
+                                .hasAnyAuthority("DELETE:CUSTOMER")
+                                .anyRequest().authenticated())
+                .exceptionHandling(exception ->
+                        exception.accessDeniedHandler(customAccessDeniedHandler)
+                                .authenticationEntryPoint(customAuthenticationEntryPoint));
         return http.build();
+//        http
+//                .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF protection
+//                .cors(configure -> configure.configurationSource(corsConfigurationSource()))  // Configure CORS (optional)
+//                .authorizeHttpRequests(request ->
+//                        request.anyRequest().permitAll()  // Allow all requests
+//                );
+//        return http.build();
 
     }
 
