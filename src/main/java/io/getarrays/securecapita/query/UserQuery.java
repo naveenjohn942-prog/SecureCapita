@@ -10,7 +10,7 @@ public class UserQuery {
     public static final String DELETE_VERIFICATION_CODE_BY_USER_ID_AND_CODE = "DELETE FROM TwoFactorVerifications WHERE user_id = :userId AND code = :code";
     public static final String INSERT_VERIFICATION_CODE_QUERY = "INSERT INTO TwoFactorVerifications (user_id, code, expiration_date) VALUES (:userId, :code, :expDate) ";
     public static final String SELECT_USER_BY_USER_CODE_QUERY = "SELECT * FROM Users WHERE id = (SELECT user_id FROM TwoFactorVerifications WHERE code = :code)";
-    public static final String SELECT_CODE_EXPIRATION_QUERY = "SELECT expiration_date < NOW() FROM TwoFactorVerifications WHERE user_id = :userId AND code = :code";
+    public static final String SELECT_CODE_EXPIRATION_QUERY = "SELECT expiration_date < NOW() AS is_expired FROM TwoFactorVerifications WHERE code = :code";
     public static final String DELETE_PASSWORD_VERIFICATION_BY_USER_ID_QUERY = "DELETE FROM ResetPasswordVerifications WHERE user_id = :userId";
     public static final String INSERT_PASSWORD_VERIFICATION_QUERY = "INSERT INTO ResetPasswordVerifications (user_id, url, expiration_date) VALUES (:userId, :url, :expirationDate)";
     public static  final String SELECT_EXPIRATION_BY_URL = "SELECT expiration_date < NOW() FROM ResetPasswordVerifications WHERE url = :url";

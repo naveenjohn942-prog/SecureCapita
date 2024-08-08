@@ -158,6 +158,9 @@ public class UserRepositoryImpl implements UserRepository<User>, UserDetailsServ
 
     @Override
     public User verifyCode(String email, String code) {
+        if (isVerificationCodeExpired(code)) {
+            throw new ApiException("The code has expired.Please try again.");
+        }
         try {
             User userByCode = jdbc.queryForObject(SELECT_USER_BY_USER_CODE_QUERY, Map.of("code", code), new UserRowMapper());
             User userByEmail = jdbc.queryForObject(SELECT_USER_BY_EMAIL_QUERY, Map.of("email", email), new UserRowMapper());
@@ -169,6 +172,16 @@ public class UserRepositoryImpl implements UserRepository<User>, UserDetailsServ
             }
         }catch (EmptyResultDataAccessException e) {
             throw new ApiException("User not found with email: " + email);
+        }catch (Exception e) {
+            throw new ApiException("An error occurred.");
+        }
+    }
+
+    private Boolean isVerificationCodeExpired(String code) {
+        try {
+            return jdbc.queryForObject(SELECT_CODE_EXPIRATION_QUERY, Map.of("code", code), Boolean.class);
+        }catch (EmptyResultDataAccessException e) {
+            throw new ApiException("This code is Invalid. Please try again.");
         }catch (Exception e) {
             throw new ApiException("An error occurred.");
         }

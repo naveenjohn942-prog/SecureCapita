@@ -1,9 +1,9 @@
 package io.getarrays.securecapita.controller;
 
 import io.getarrays.securecapita.dto.UserDTO;
+import io.getarrays.securecapita.form.LoginForm;
 import io.getarrays.securecapita.model.HttpResponse;
 import io.getarrays.securecapita.model.User;
-import io.getarrays.securecapita.form.*;
 import io.getarrays.securecapita.model.UserPrincipal;
 import io.getarrays.securecapita.provider.TokenProvider;
 import io.getarrays.securecapita.service.RoleService;
@@ -14,13 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.token.TokenService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Map;
 
+import static io.getarrays.securecapita.dtoMapper.UserDTOMapper.toUser;
 import static java.time.LocalDateTime.now;
 import static java.util.Map.of;
 
@@ -120,7 +119,7 @@ public class UserController {
     }
 
     private UserPrincipal getUserPrincipal(UserDTO user) {
-        return new UserPrincipal(userService.getUser(user.getEmail()),roleService.getRoleByUserId(user.getId()).getPermissions());
+        return new UserPrincipal(toUser(userService.getUserByEmail(user.getEmail())),roleService.getRoleByUserId(user.getId()).getPermissions());
     }
 
     private ResponseEntity<HttpResponse> sendVerificationCode(UserDTO user) {
