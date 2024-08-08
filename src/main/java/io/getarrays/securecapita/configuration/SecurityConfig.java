@@ -1,5 +1,6 @@
 package io.getarrays.securecapita.configuration;
 
+import io.getarrays.securecapita.filter.CustomAuthorizationFilter;
 import io.getarrays.securecapita.handler.CustomAccessDeniedHandler;
 import io.getarrays.securecapita.handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -36,7 +38,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final UserDetailsService userDetailsService;
-
+    private final CustomAuthorizationFilter customAuthorizationFilter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -56,7 +58,8 @@ public class SecurityConfig {
                                 .anyRequest().authenticated())
                 .exceptionHandling(exception ->
                         exception.accessDeniedHandler(customAccessDeniedHandler)
-                                .authenticationEntryPoint(customAuthenticationEntryPoint));
+                                .authenticationEntryPoint(customAuthenticationEntryPoint))
+                .addFilterBefore(customAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
 //        http
 //                .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF protection
