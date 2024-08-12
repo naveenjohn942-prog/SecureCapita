@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static java.util.Map.of;
 @RestControllerAdvice
 @Slf4j
 public class HandelException extends ResponseEntityExceptionHandler implements ErrorController {
