@@ -8,6 +8,6 @@ public enum VerificationType {
         this.type = type;
     }
     public String getType() {
-        return this.type.toUpperCase();
+        return this.type.toLowerCase();
     }
 }
