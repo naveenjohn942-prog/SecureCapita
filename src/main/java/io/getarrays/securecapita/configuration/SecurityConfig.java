@@ -33,7 +33,9 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final String[] PUBLIC_URLS = {"/user/verify/password/**","/user/login/**", "/user/register/**","/user/verify/code/**","/user/resetpassword/**"};
+    private static final String[] PUBLIC_URLS = {"/user/verify/password/**","/user/login/**", "/user/register/**","/user/verify/code/**"
+            ,"/user/resetpassword/**"
+            ,"/user/verify/account/**","/user/refresh/token/**"};
     private final BCryptPasswordEncoder encoder;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;

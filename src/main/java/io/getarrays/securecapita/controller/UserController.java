@@ -13,6 +13,7 @@
     import jakarta.servlet.http.HttpServletResponse;
     import jakarta.validation.Valid;
     import lombok.RequiredArgsConstructor;
+    import org.apache.http.auth.AUTH;
     import org.springframework.http.HttpStatus;
     import org.springframework.http.ResponseEntity;
     import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,7 @@
     import static java.time.LocalDateTime.now;
     import static java.util.Map.of;
     import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
+    import static org.springframework.http.HttpHeaders.AUTHORIZATION;
     import static org.springframework.http.HttpStatus.NOT_FOUND;
     import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.unauthenticated;
 
@@ -42,6 +44,7 @@
         private final RoleService roleService;
         private final HttpServletRequest request;
         private final HttpServletResponse response;
+        private static final String TOKEN_PREFIX = "Bearer ";
 
 
         @PostMapping("/login")
@@ -121,6 +124,53 @@
                             .statusCode(HttpStatus.OK.value())
                             .build());
         }
+
+        @GetMapping("/verify/account/{key}")
+        public ResponseEntity<HttpResponse> verifyAccount(@PathVariable String key){
+            return ResponseEntity.ok().body(
+                    HttpResponse.builder()
+                            .timeStamp(now().toString())
+                            .message(userService.verifyAccountKey(key).getEnabled()?"Account already verified":"Account verified")
+                            .status(HttpStatus.OK)
+                            .statusCode(HttpStatus.OK.value())
+                            .build());
+        }
+
+        @GetMapping("/refresh/token")
+        public ResponseEntity<HttpResponse> refreshToken(HttpServletRequest request){
+            if(isHeaderAndTokenValid(request)){
+                String token = request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length());
+                UserDTO user = userService.getUserByEmail(tokenProvider.getSubject(token,request));
+                return ResponseEntity.ok().body(
+                        HttpResponse.builder()
+                                .timeStamp(now().toString())
+                                .data(of("user",user,"access_token",tokenProvider.createAccessToken(getUserPrincipal(user))
+                                        ,"refresh_token",token))
+                                .message("Token Refreshed")
+                                .status(HttpStatus.OK)
+                                .statusCode(HttpStatus.OK.value())
+                                .build());
+            }else{
+                return ResponseEntity.badRequest().body(
+                                HttpResponse.builder()
+                                        .timeStamp(now().toString())
+                                        .reason("refresh token is invalid or missing")
+                                        .developerMessage("refresh token is invalid or missing")
+                                        .status(HttpStatus.BAD_REQUEST)
+                                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                                        .build());
+            }
+
+        }
+
+        private boolean isHeaderAndTokenValid(HttpServletRequest request) {
+            return request.getHeader(AUTHORIZATION) !=null
+                    && request.getHeader(AUTHORIZATION).startsWith(TOKEN_PREFIX)
+                    && tokenProvider.isTokenValid(
+                            tokenProvider.getSubject(request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length()),request),
+                            request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length()));
+        }
+
         @RequestMapping("/error")
         public ResponseEntity<HttpResponse> handleError(HttpServletRequest request){
             return ResponseEntity.badRequest().body(
