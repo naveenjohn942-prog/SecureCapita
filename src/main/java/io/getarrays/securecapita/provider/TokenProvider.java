@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.List;
 
+import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
@@ -47,14 +48,14 @@ public class TokenProvider {
         return JWT.create().withIssuer(GET_ARRAY_LLC).withAudience(CUSTOMER_MANAGEMENT_SERVICE)
                 .withIssuedAt(new Date()).withSubject(userPrincipal.getUsername()).withArrayClaim(AUTHORITIES,getClaimsFromUser(userPrincipal))
                 .withExpiresAt(new Date(currentTimeMillis()+ACCESS_TOKEN_EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(secret.getBytes()));
+                .sign(HMAC512(secret.getBytes()));
     }
 
     public String createRefreshToken(UserPrincipal userPrincipal) {
         return JWT.create().withIssuer(GET_ARRAY_LLC).withAudience(CUSTOMER_MANAGEMENT_SERVICE)
-                .withIssuedAt(new Date()).withSubject(userPrincipal.getUsername())
-                .withExpiresAt(new Date(currentTimeMillis()+REFRESH_TOKEN_EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(secret.getBytes()));
+                .withIssuedAt(new Date()).withSubject(userPrincipal.getUsername()).
+                withExpiresAt(new Date(currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME))
+                .sign(HMAC512(secret.getBytes()));
     }
 
     public String getSubject(String token, HttpServletRequest request){
@@ -113,7 +114,7 @@ public class TokenProvider {
     private JWTVerifier getJWTVerifier() {
         JWTVerifier verifier;
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret.getBytes());
+            Algorithm algorithm = Algorithm.HMAC512(secret.getBytes());
             verifier = JWT.require(algorithm).withIssuer(GET_ARRAY_LLC).build();
         }catch (JWTVerificationException exception) {
             throw new JWTVerificationException(TOKEN_CANNOT_BE_VERIFIED);
