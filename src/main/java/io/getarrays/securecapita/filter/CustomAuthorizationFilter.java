@@ -15,7 +15,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import static io.getarrays.securecapita.utils.ExceptionUtils.processError;
 import static java.util.Arrays.asList;
@@ -29,23 +28,17 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     private static final String[] PUBLIC_ROUTES = {"/user/login", "/user/register", "/user/verify/code", "/user/refresh/token"};
     private final TokenProvider tokenProvider;
-
-    private static final String TOKEN_KEY = "token";
-    private static final String EMAIL_KEY = "email";
     private static final String TOKEN_PREFIX = "Bearer ";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try{
-            Map<String, String> values = getRequestValues(request);
-            log.info("came here" + "1");
             String token = getToken(request);
-            log.info("came here" + "2");
-            if(tokenProvider.isTokenValid(values.get(EMAIL_KEY), token)){
-                log.info("came here" + "3" + values + "gap " );
-                List<GrantedAuthority> authorities = tokenProvider.getAuthorities(values.get(TOKEN_KEY));
+            Long userId = getUserId(request);
+            if(tokenProvider.isTokenValid(userId, token)){
+                List<GrantedAuthority> authorities = tokenProvider.getAuthorities(token);
                 log.info(authorities.toString() + "came here" + "4");
-                Authentication authentication = tokenProvider.getAuthentication(values.get(EMAIL_KEY), authorities, request);
+                Authentication authentication = tokenProvider.getAuthentication(userId, authorities, request);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
             else {
@@ -71,8 +64,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     }
 
-    private Map<String, String> getRequestValues(HttpServletRequest request) {
-        return Map.of(EMAIL_KEY, tokenProvider.getSubject(getToken(request), request), TOKEN_KEY, getToken(request));
+    private Long getUserId(HttpServletRequest request) {
+        return  tokenProvider.getSubject(getToken(request), request);
 
     }
 
