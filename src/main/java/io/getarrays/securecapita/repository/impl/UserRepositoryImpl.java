@@ -3,6 +3,7 @@ package io.getarrays.securecapita.repository.impl;
 import io.getarrays.securecapita.dto.UserDTO;
 import io.getarrays.securecapita.enumeration.VerificationType;
 import io.getarrays.securecapita.exception.ApiException;
+import io.getarrays.securecapita.form.UpdateForm;
 import io.getarrays.securecapita.model.Role;
 import io.getarrays.securecapita.model.User;
 import io.getarrays.securecapita.model.UserPrincipal;
@@ -86,7 +87,17 @@ public class UserRepositoryImpl implements UserRepository<User>, UserDetailsServ
 
     @Override
     public User get(Long id) {
-        return null; // To be implemented
+        try{
+            return jdbc.queryForObject(GET_USER_BY_ID, of("id", id), new UserRowMapper());
+        }
+        catch(EmptyResultDataAccessException e ){
+            log.error(e.getMessage());
+            throw new ApiException(e.getMessage());
+        }
+        catch(Exception e ){
+            log.error(e.getMessage());
+            throw new ApiException("An error occurred");
+        }
     }
 
     @Override
@@ -237,6 +248,52 @@ public class UserRepositoryImpl implements UserRepository<User>, UserDetailsServ
         }catch (Exception e) {
             throw new ApiException("An error occurred.");
         }
+    }
+
+    @Override
+    public User updateUserDetails(UpdateForm user) {
+        try{
+            jdbc.update(UPDATE_USER_DETAILS_QUERY, getUserDetailsSqlParameterSource(user));
+            return get(user.getId());
+        }
+        catch (EmptyResultDataAccessException e){
+            log.error(e.getMessage());
+            throw new ApiException("No user found by user id: "+ user.getId());
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ApiException("An error occurred.");
+        }
+    }
+
+    @Override
+    public void updatePassword(Long id, String newPassword, String currentPassword, String confirmPassword) {
+        if(!newPassword.equals(confirmPassword)) {
+            throw new ApiException("Password don't match please try again");
+        }
+        User user = get(id);
+        if (encoder.matches(currentPassword, user.getPassword())) {
+            try {
+                jdbc.update(UPDATE_USER_PASSWORD_BY_ID_QUERY, of("userId", id, "password", encoder.encode(newPassword)));
+            } catch (Exception e) {
+                throw new ApiException("An error occurred");
+            }
+        }else {
+            throw new ApiException("Password is incorrect please try again");
+        }
+
+    }
+
+    private SqlParameterSource getUserDetailsSqlParameterSource(UpdateForm user) {
+        return new MapSqlParameterSource()
+                .addValue("id", user.getId())
+                .addValue("firstName", user.getFirstName())
+                .addValue("lastName", user.getLastName())
+                .addValue("phone", user.getPhone())
+                .addValue("address", user.getAddress())
+                .addValue("enabled", user.getEnabled())
+                .addValue("email", user.getEmail())
+                .addValue("title", user.getTitle())
+                .addValue("bio", user.getBio());
     }
 
     private Boolean isLinkExpired(String key, VerificationType password) {

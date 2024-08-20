@@ -1,6 +1,7 @@
 package io.getarrays.securecapita.service.Impl;
 
 import io.getarrays.securecapita.dto.UserDTO;
+import io.getarrays.securecapita.form.UpdateForm;
 import io.getarrays.securecapita.model.Role;
 import io.getarrays.securecapita.model.User;
 import io.getarrays.securecapita.repository.RoleRepository;
@@ -55,6 +56,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO verifyAccountKey(String key) {
         return mapToUserDTO(userRepository.verifyAccountKey(key));
+    }
+
+    @Override
+    public UserDTO updateUserDetails(UpdateForm user) {
+        return mapToUserDTO(userRepository.updateUserDetails(user));
+
+    }
+
+    @Override
+    public UserDTO getUserById(long userId) {
+        return mapToUserDTO(userRepository.get(userId));
+    }
+
+    @Override
+    public void updatePassword(Long id, String newPassword, String currentPassword, String confirmPassword) {
+        userRepository.updatePassword(id, newPassword, currentPassword, confirmPassword);
+    }
+
+    @Override
+    public void updateUserRole(Long userId, String roleName) {
+        roleRepository.updateUserRole(userId, roleName);
     }
 
     private UserDTO mapToUserDTO(User user) {

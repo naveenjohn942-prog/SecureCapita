@@ -24,15 +24,19 @@ public class ExceptionUtils {
     public static void processError(HttpServletRequest request, HttpServletResponse response, Exception e){
         HttpResponse httpResponse;
         if(e instanceof ApiException || e instanceof DisabledException || e instanceof LockedException
-                ||  e instanceof InvalidClaimException || e instanceof TokenExpiredException
-                || e instanceof BadCredentialsException){
-
+                ||  e instanceof InvalidClaimException || e instanceof BadCredentialsException){
+            System.out.println(e.getMessage());
             httpResponse = getHttpResponse(response, e.getMessage(), BAD_REQUEST);
+            writeResponse(response, httpResponse);
+        }else if (e instanceof TokenExpiredException){
+            httpResponse = getHttpResponse(response, e.getMessage(), UNAUTHORIZED);
+            writeResponse(response, httpResponse);
         }
         else{
             httpResponse = getHttpResponse(response, "An error occurred. Please try again.", INTERNAL_SERVER_ERROR);
+            writeResponse(response, httpResponse);
+
         }
-        writeResponse(response, httpResponse);
         log.error(e.getMessage());
     }
 

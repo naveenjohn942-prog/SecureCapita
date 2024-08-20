@@ -57,4 +57,9 @@ public class UserPrincipal implements UserDetails {
     public UserDTO getUser(){
         return fromUser(this.user,role);
     }
+
+    public Boolean isMfaEnabled() {
+        return this.user.getMfaEnabled();
+    }
+
 }

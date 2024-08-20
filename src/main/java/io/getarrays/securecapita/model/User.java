@@ -40,5 +40,5 @@ public class User {
     private String imageUrl;
     private Boolean nonLocked;
     private Boolean mfaEnabled;
-    private LocalDateTime createdOn = LocalDateTime.now();;
+    private LocalDateTime createdOn = LocalDateTime.now();
 }

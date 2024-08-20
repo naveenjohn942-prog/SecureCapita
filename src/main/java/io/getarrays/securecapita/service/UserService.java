@@ -1,6 +1,7 @@
 package io.getarrays.securecapita.service;
 
 import io.getarrays.securecapita.dto.UserDTO;
+import io.getarrays.securecapita.form.UpdateForm;
 import io.getarrays.securecapita.model.User;
 
 public interface UserService {
@@ -19,4 +20,12 @@ public interface UserService {
     void renewPassword(String key, String password, String confirmPassword);
 
     UserDTO verifyAccountKey(String key);
+
+    UserDTO updateUserDetails(UpdateForm user);
+
+    UserDTO getUserById(long userId);
+
+    void updatePassword(Long id, String newPassword, String currentPassword, String confirmPassword);
+
+    void updateUserRole(Long userId, String roleName);
 }

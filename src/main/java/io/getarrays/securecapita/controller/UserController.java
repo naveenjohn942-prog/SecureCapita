@@ -3,6 +3,8 @@
     import io.getarrays.securecapita.dto.UserDTO;
     import io.getarrays.securecapita.exception.ApiException;
     import io.getarrays.securecapita.form.LoginForm;
+    import io.getarrays.securecapita.form.UpdateForm;
+    import io.getarrays.securecapita.form.UpdatePasswordForm;
     import io.getarrays.securecapita.model.HttpResponse;
     import io.getarrays.securecapita.model.User;
     import io.getarrays.securecapita.model.UserPrincipal;
@@ -23,9 +25,13 @@
     import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
     import java.net.URI;
+    import java.util.concurrent.TimeUnit;
 
     import static io.getarrays.securecapita.dtoMapper.UserDTOMapper.toUser;
     import static io.getarrays.securecapita.utils.ExceptionUtils.processError;
+//    import static io.getarrays.securecapita.utils.UserUtils.getAuthenticatedUser;
+    import static io.getarrays.securecapita.utils.UserUtils.getAuthenticatedUser;
+    import static io.getarrays.securecapita.utils.UserUtils.getLoggedInUser;
     import static java.time.LocalDateTime.now;
     import static java.util.Map.of;
     import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
@@ -46,12 +52,12 @@
         private final HttpServletResponse response;
         private static final String TOKEN_PREFIX = "Bearer ";
 
-
         @PostMapping("/login")
         public ResponseEntity<HttpResponse> login(@RequestBody @Valid LoginForm loginForm) {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword()));
             Authentication authentication = authenticate(loginForm.getEmail(), loginForm.getPassword());
-            UserDTO user = getAuthenticatedUser(authentication);
+            UserDTO user = getLoggedInUser(authentication);
+            System.out.println("MFA Enabled: " + user.getMfaEnabled());
             return user.getMfaEnabled() ? sendVerificationCode(user):sendResponse(user);
     //        try {
     //            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword()));
@@ -80,9 +86,7 @@
     //        }
 
         }
-        private UserDTO getAuthenticatedUser(Authentication authentication) {
-            return ((UserPrincipal) authentication.getPrincipal()).getUser();
-        }
+
 
 
         @PostMapping("/register")
@@ -98,14 +102,28 @@
                             .statusCode(HttpStatus.CREATED.value())
                             .build());
         }
-        @GetMapping("profile")
+        @GetMapping("/profile")
         public ResponseEntity<HttpResponse> profile(Authentication authentication){
-            UserDTO user = userService.getUserByEmail(authentication.getName());
+            UserDTO user = userService.getUserByEmail(getAuthenticatedUser(authentication).getEmail());
             return ResponseEntity.ok().body(
                     HttpResponse.builder()
                             .timeStamp(now().toString())
-                            .data(of("user",user))
+                            .data(of("user",user,"roles",roleService.getRoles()))
                             .message("Profile Retreived")
+                            .status(HttpStatus.OK)
+                            .statusCode(HttpStatus.OK.value())
+                            .build());
+        }
+
+        @PatchMapping("/update")
+        public ResponseEntity<HttpResponse> updateUser(@RequestBody @Valid UpdateForm user) throws InterruptedException {
+            TimeUnit.SECONDS.sleep(3);
+            UserDTO updateUser = userService.updateUserDetails(user);
+            return ResponseEntity.ok().body(
+                    HttpResponse.builder()
+                            .timeStamp(now().toString())
+                            .data(of("user",updateUser))
+                            .message("User updated")
                             .status(HttpStatus.OK)
                             .statusCode(HttpStatus.OK.value())
                             .build());
@@ -136,11 +154,38 @@
                             .build());
         }
 
+        @PatchMapping("/update/password")
+        public ResponseEntity<HttpResponse> updatePassword(Authentication authentication,@RequestBody @Valid UpdatePasswordForm form){
+            UserDTO userDTO = getAuthenticatedUser(authentication);
+            userService.updatePassword(userDTO.getId(),form.getNewPassword(),form.getCurrentPassword(),form.getConfirmNewPassword());
+            return ResponseEntity.ok().body(
+                    HttpResponse.builder()
+                            .timeStamp(now().toString())
+                            .message("Password Updated successfully")
+                            .status(HttpStatus.OK)
+                            .statusCode(HttpStatus.OK.value())
+                            .build());
+        }
+
+        @PatchMapping("/update/role/{roleName}")
+        public ResponseEntity<HttpResponse> updateUserRole(Authentication authentication,@PathVariable String roleName){
+            UserDTO userDTO = getAuthenticatedUser(authentication);
+            userService.updateUserRole(userDTO.getId(),roleName);
+            return ResponseEntity.ok().body(
+                    HttpResponse.builder()
+                            .data(of("user",userService.getUserById(userDTO.getId()),"roles",roleService.getRoles()))
+                            .timeStamp(now().toString())
+                            .message("Role Updated successfully")
+                            .status(HttpStatus.OK)
+                            .statusCode(HttpStatus.OK.value())
+                            .build());
+        }
+
         @GetMapping("/refresh/token")
         public ResponseEntity<HttpResponse> refreshToken(HttpServletRequest request){
             if(isHeaderAndTokenValid(request)){
                 String token = request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length());
-                UserDTO user = userService.getUserByEmail(tokenProvider.getSubject(token,request));
+                UserDTO user = userService.getUserById(tokenProvider.getSubject(token,request));
                 return ResponseEntity.ok().body(
                         HttpResponse.builder()
                                 .timeStamp(now().toString())
@@ -164,11 +209,12 @@
         }
 
         private boolean isHeaderAndTokenValid(HttpServletRequest request) {
-            return request.getHeader(AUTHORIZATION) !=null
-                    && request.getHeader(AUTHORIZATION).startsWith(TOKEN_PREFIX)
+            return  request.getHeader(AUTHORIZATION) != null
+                    &&  request.getHeader(AUTHORIZATION).startsWith(TOKEN_PREFIX)
                     && tokenProvider.isTokenValid(
-                            tokenProvider.getSubject(request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length()),request),
-                            request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length()));
+                    tokenProvider.getSubject(request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length()), request),
+                    request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length())
+            );
         }
 
         @RequestMapping("/error")
@@ -244,7 +290,7 @@
                 Authentication authentication = authenticationManager.authenticate(unauthenticated(email, password));
                 return authentication;
             }catch (Exception e) {
-                processError(request,response,e);
+//                processError(request,response,e);
                 throw new ApiException(e.getMessage());
             }
         }
