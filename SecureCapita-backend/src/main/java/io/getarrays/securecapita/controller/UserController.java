@@ -1,6 +1,7 @@
     package io.getarrays.securecapita.controller;
 
     import io.getarrays.securecapita.dto.UserDTO;
+    import io.getarrays.securecapita.event.NewUserEvent;
     import io.getarrays.securecapita.exception.ApiException;
     import io.getarrays.securecapita.form.LoginForm;
     import io.getarrays.securecapita.form.SettingsForm;
@@ -12,12 +13,11 @@
     import io.getarrays.securecapita.provider.TokenProvider;
     import io.getarrays.securecapita.service.RoleService;
     import io.getarrays.securecapita.service.UserService;
-    import jakarta.servlet.annotation.MultipartConfig;
     import jakarta.servlet.http.HttpServletRequest;
     import jakarta.servlet.http.HttpServletResponse;
     import jakarta.validation.Valid;
     import lombok.RequiredArgsConstructor;
-    import org.apache.http.auth.AUTH;
+    import org.springframework.context.ApplicationEventPublisher;
     import org.springframework.http.HttpStatus;
     import org.springframework.http.ResponseEntity;
     import org.springframework.security.authentication.AuthenticationManager;
@@ -27,20 +27,18 @@
     import org.springframework.web.multipart.MultipartFile;
     import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-    import java.io.IOException;
     import java.net.URI;
     import java.nio.file.Files;
     import java.nio.file.Paths;
     import java.util.concurrent.TimeUnit;
 
     import static io.getarrays.securecapita.dtoMapper.UserDTOMapper.toUser;
+    import static io.getarrays.securecapita.enumeration.EventType.*;
     import static io.getarrays.securecapita.utils.ExceptionUtils.processError;
-//    import static io.getarrays.securecapita.utils.UserUtils.getAuthenticatedUser;
     import static io.getarrays.securecapita.utils.UserUtils.getAuthenticatedUser;
     import static io.getarrays.securecapita.utils.UserUtils.getLoggedInUser;
     import static java.time.LocalDateTime.now;
     import static java.util.Map.of;
-    import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
     import static org.springframework.http.HttpHeaders.AUTHORIZATION;
     import static org.springframework.http.HttpStatus.NOT_FOUND;
     import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.unauthenticated;
@@ -58,12 +56,12 @@
         private final HttpServletRequest request;
         private final HttpServletResponse response;
         private static final String TOKEN_PREFIX = "Bearer ";
+        private final ApplicationEventPublisher publisher;
 
         @PostMapping("/login")
         public ResponseEntity<HttpResponse> login(@RequestBody @Valid LoginForm loginForm) {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword()));
-            Authentication authentication = authenticate(loginForm.getEmail(), loginForm.getPassword());
-            UserDTO user = getLoggedInUser(authentication);
+            UserDTO user = authenticate(loginForm.getEmail(), loginForm.getPassword());
             System.out.println("MFA Enabled: " + user.getMfaEnabled());
             return user.getMfaEnabled() ? sendVerificationCode(user):sendResponse(user);
     //        try {
@@ -339,12 +337,20 @@
             return new UserPrincipal(toUser(userService.getUserByEmail(user.getEmail())),roleService.getRoleByUserId(user.getId()));
         }
 
-        private Authentication authenticate(String email, String password) {
+        private UserDTO authenticate(String email, String password) {
             try {
+                if(null!=userService.getUserByEmail(email)){
+                    publisher.publishEvent(new NewUserEvent(LOGIN_ATTEMPT, email));
+                }
                 Authentication authentication = authenticationManager.authenticate(unauthenticated(email, password));
-                return authentication;
+                UserDTO loggedInUser = getLoggedInUser(authentication);
+                if(!loggedInUser.getMfaEnabled()){
+                    publisher.publishEvent(new NewUserEvent(LOGIN_ATTEMPT_SUCCESS, email));
+                }
+                return loggedInUser;
             }catch (Exception e) {
-//                processError(request,response,e);
+                publisher.publishEvent(new NewUserEvent(LOGIN_ATTEMPT_FAILURE, email));
+                processError(request,response,e);
                 throw new ApiException(e.getMessage());
             }
         }
