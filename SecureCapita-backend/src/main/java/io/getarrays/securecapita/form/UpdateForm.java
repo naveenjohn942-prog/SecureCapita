@@ -7,21 +7,28 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 3/14/2023
+ */
+
 @Getter
 @Setter
 public class UpdateForm {
-    @NotNull(message = "ID cannot be empty")
+    @NotNull(message = "ID cannot be null or empty")
     private Long id;
-    @NotEmpty(message = "Name cannot be empty")
+    @NotEmpty(message = "First name cannot be empty")
     private String firstName;
-    @NotEmpty(message = "Name cannot be empty")
+    @NotEmpty(message = "Last name cannot be empty")
     private String lastName;
+    @NotEmpty(message = "Email cannot be empty")
+    @Email(message = "Invalid email. Please enter a valid email address")
+    private String email;
+    @Pattern(regexp = "^\\d{11}$", message = "Invalid phone number")
     private String phone;
     private String address;
-    @NotEmpty(message="email cannot be empty")
-    @Email(message = "Invalid email entered. Please enter valid email id")
-    private String email;
-    private Boolean enabled;
     private String title;
     private String bio;
 }

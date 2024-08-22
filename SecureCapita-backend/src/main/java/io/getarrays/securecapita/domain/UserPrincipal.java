@@ -1,24 +1,29 @@
-package io.getarrays.securecapita.model;
+package io.getarrays.securecapita.domain;
 
 import io.getarrays.securecapita.dto.UserDTO;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 
-import static io.getarrays.securecapita.dtoMapper.UserDTOMapper.fromUser;
-import static java.util.Arrays.copyOfRange;
+import static io.getarrays.securecapita.dtomapper.UserDTOMapper.fromUser;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
+
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 12/25/2022
+ */
 
 @RequiredArgsConstructor
 public class UserPrincipal implements UserDetails {
     private final User user;
     private final Role role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return stream(this.role.getPermissions().split(",".trim())).map(SimpleGrantedAuthority::new).collect(toList());
@@ -41,7 +46,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return this.user.getNonLocked();
+        return this.user.isNotLocked();
     }
 
     @Override
@@ -51,15 +56,10 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.user.getEnabled();
+        return this.user.isEnabled();
     }
 
-    public UserDTO getUser(){
-        return fromUser(this.user,role);
+    public UserDTO getUser() {
+        return fromUser(this.user, role);
     }
-
-    public Boolean isMfaEnabled() {
-        return this.user.getMfaEnabled();
-    }
-
 }

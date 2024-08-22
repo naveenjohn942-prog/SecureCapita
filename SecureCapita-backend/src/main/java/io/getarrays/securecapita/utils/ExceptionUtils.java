@@ -3,8 +3,8 @@ package io.getarrays.securecapita.utils;
 import com.auth0.jwt.exceptions.InvalidClaimException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getarrays.securecapita.domain.HttpResponse;
 import io.getarrays.securecapita.exception.ApiException;
-import io.getarrays.securecapita.model.HttpResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -19,54 +19,53 @@ import static java.time.LocalDateTime.now;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 1/5/2023
+ */
+
 @Slf4j
 public class ExceptionUtils {
-    public static void processError(HttpServletRequest request, HttpServletResponse response, Exception e){
-        HttpResponse httpResponse;
-        if(e instanceof ApiException || e instanceof DisabledException || e instanceof LockedException
-                ||  e instanceof InvalidClaimException || e instanceof BadCredentialsException){
-            System.out.println(e.getMessage());
-            httpResponse = getHttpResponse(response, e.getMessage(), BAD_REQUEST);
-            writeResponse(response, httpResponse);
-        }else if (e instanceof TokenExpiredException){
-            httpResponse = getHttpResponse(response, e.getMessage(), UNAUTHORIZED);
-            writeResponse(response, httpResponse);
-        }
-        else{
-            httpResponse = getHttpResponse(response, "An error occurred. Please try again.", INTERNAL_SERVER_ERROR);
-            writeResponse(response, httpResponse);
 
+    public static void processError(HttpServletRequest request, HttpServletResponse response, Exception exception) {
+        if(exception instanceof ApiException || exception instanceof DisabledException || exception instanceof LockedException ||
+                exception instanceof BadCredentialsException || exception instanceof InvalidClaimException) {
+            HttpResponse httpResponse = getHttpResponse(response, exception.getMessage(), BAD_REQUEST);
+            writeResponse(response, httpResponse);
+        } else if (exception instanceof TokenExpiredException) {
+            HttpResponse httpResponse = getHttpResponse(response, exception.getMessage(), UNAUTHORIZED);
+            writeResponse(response, httpResponse);
+        } else {
+            HttpResponse httpResponse = getHttpResponse(response, "An error occurred. Please try again.", INTERNAL_SERVER_ERROR);
+            writeResponse(response, httpResponse);
         }
-        log.error(e.getMessage());
+        log.error(exception.getMessage());
     }
 
     private static void writeResponse(HttpServletResponse response, HttpResponse httpResponse) {
         OutputStream out;
-        try {
-
+        try{
             out = response.getOutputStream();
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(out, httpResponse);
             out.flush();
+        }catch (Exception exception) {
+            log.error(exception.getMessage());
+            exception.printStackTrace();
         }
-        catch (Exception e){
-            log.error(e.getMessage());
-            e.printStackTrace();
-        }
-
-
     }
 
-    private static HttpResponse getHttpResponse(HttpServletResponse response, String message, HttpStatus badRequest) {
+    private static HttpResponse getHttpResponse(HttpServletResponse response, String message, HttpStatus httpStatus) {
         HttpResponse httpResponse = HttpResponse.builder()
                 .timeStamp(now().toString())
                 .reason(message)
-                .status(badRequest)
-                .statusCode(badRequest.value())
+                .status(httpStatus)
+                .statusCode(httpStatus.value())
                 .build();
         response.setContentType(APPLICATION_JSON_VALUE);
-        response.setStatus(UNAUTHORIZED.value());
-
+        response.setStatus(httpStatus.value());
         return httpResponse;
     }
 }

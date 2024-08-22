@@ -15,9 +15,9 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
   sql:
-     init:
-       mode: never
-       continue-on-error: false
+    init:
+      mode: never
+      continue-on-error: false
 management:
   endpoints:
     web:

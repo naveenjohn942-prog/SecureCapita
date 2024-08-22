@@ -1,9 +1,9 @@
-package io.getarrays.securecapita.service.Impl;
+package io.getarrays.securecapita.service.implementation;
 
+import io.getarrays.securecapita.domain.Role;
+import io.getarrays.securecapita.domain.User;
 import io.getarrays.securecapita.dto.UserDTO;
 import io.getarrays.securecapita.form.UpdateForm;
-import io.getarrays.securecapita.model.Role;
-import io.getarrays.securecapita.model.User;
 import io.getarrays.securecapita.repository.RoleRepository;
 import io.getarrays.securecapita.repository.UserRepository;
 import io.getarrays.securecapita.service.UserService;
@@ -11,13 +11,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import static io.getarrays.securecapita.dtoMapper.UserDTOMapper.fromUser;
+import static io.getarrays.securecapita.dtomapper.UserDTOMapper.fromUser;
+
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 8/28/2022
+ */
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository<User> userRepository;
-    private final RoleRepository<Role> roleRepository;
+    private final RoleRepository<Role> roleRoleRepository;
+
     @Override
     public UserDTO createUser(User user) {
         return mapToUserDTO(userRepository.create(user));
@@ -35,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO verifyCode(String email, String code) {
-        return mapToUserDTO(userRepository.verifyCode(email,code));
+        return mapToUserDTO(userRepository.verifyCode(email, code));
     }
 
     @Override
@@ -46,12 +54,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO verifyPasswordKey(String key) {
         return mapToUserDTO(userRepository.verifyPasswordKey(key));
-
     }
 
     @Override
     public void renewPassword(String key, String password, String confirmPassword) {
-        userRepository.renewPassword(key,password,confirmPassword);
+        userRepository.renewPassword(key, password, confirmPassword);
     }
 
     @Override
@@ -62,27 +69,26 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO updateUserDetails(UpdateForm user) {
         return mapToUserDTO(userRepository.updateUserDetails(user));
-
     }
 
     @Override
-    public UserDTO getUserById(long userId) {
+    public UserDTO getUserById(Long userId) {
         return mapToUserDTO(userRepository.get(userId));
     }
 
     @Override
-    public void updatePassword(Long id, String newPassword, String currentPassword, String confirmPassword) {
-        userRepository.updatePassword(id, newPassword, currentPassword, confirmPassword);
+    public void updatePassword(Long id, String currentPassword, String newPassword, String confirmNewPassword) {
+        userRepository.updatePassword(id, currentPassword, newPassword, confirmNewPassword);
     }
 
     @Override
     public void updateUserRole(Long userId, String roleName) {
-        roleRepository.updateUserRole(userId, roleName);
+        roleRoleRepository.updateUserRole(userId, roleName);
     }
 
     @Override
     public void updateAccountSettings(Long userId, Boolean enabled, Boolean notLocked) {
-        userRepository.updateAccoutSettings(userId,enabled,notLocked);
+        userRepository.updateAccountSettings(userId, enabled, notLocked);
     }
 
     @Override
@@ -92,10 +98,26 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateImage(UserDTO user, MultipartFile image) {
-        userRepository.updateImage(user,image);
+        userRepository.updateImage(user, image);
     }
 
     private UserDTO mapToUserDTO(User user) {
-        return fromUser(user,roleRepository.getRoleByUserId(user.getId()));
+        return fromUser(user, roleRoleRepository.getRoleByUserId(user.getId()));
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

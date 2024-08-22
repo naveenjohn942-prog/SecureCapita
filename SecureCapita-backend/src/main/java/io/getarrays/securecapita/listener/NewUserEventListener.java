@@ -10,6 +10,13 @@ import org.springframework.stereotype.Component;
 import static io.getarrays.securecapita.utils.RequestUtils.getDevice;
 import static io.getarrays.securecapita.utils.RequestUtils.getIpAddress;
 
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 3/21/2023
+ */
+
 @Component
 @RequiredArgsConstructor
 public class NewUserEventListener {
@@ -18,6 +25,6 @@ public class NewUserEventListener {
 
     @EventListener
     public void onNewUserEvent(NewUserEvent event) {
-        eventService.addUserEvent(event.getEmail(),event.getEventType(),getDevice(request),getIpAddress(request));
+        eventService.addUserEvent(event.getEmail(), event.getType(), getDevice(request), getIpAddress(request));
     }
 }

@@ -1,10 +1,16 @@
-package io.getarrays.securecapita.dtoMapper;
+package io.getarrays.securecapita.dtomapper;
 
+import io.getarrays.securecapita.domain.Role;
+import io.getarrays.securecapita.domain.User;
 import io.getarrays.securecapita.dto.UserDTO;
-import io.getarrays.securecapita.model.Role;
-import io.getarrays.securecapita.model.User;
 import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Component;
+
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 8/28/2022
+ */
 
 public class UserDTOMapper {
     public static UserDTO fromUser(User user) {
@@ -27,3 +33,20 @@ public class UserDTOMapper {
         return user;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

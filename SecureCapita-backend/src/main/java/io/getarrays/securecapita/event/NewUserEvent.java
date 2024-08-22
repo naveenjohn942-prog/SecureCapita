@@ -1,24 +1,26 @@
 package io.getarrays.securecapita.event;
 
 import io.getarrays.securecapita.enumeration.EventType;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
 
-import java.time.Clock;
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 3/21/2023
+ */
 
 @Getter
 @Setter
 public class NewUserEvent extends ApplicationEvent {
-    private EventType eventType;
+    private EventType type;
     private String email;
 
-    public NewUserEvent(EventType type, String email) {
+    public NewUserEvent(String email, EventType type) {
         super(email);
-        this.eventType = type;
+        this.type = type;
         this.email = email;
     }
-
 }

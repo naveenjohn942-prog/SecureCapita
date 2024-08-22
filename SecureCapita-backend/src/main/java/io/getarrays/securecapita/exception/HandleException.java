@@ -1,7 +1,7 @@
 package io.getarrays.securecapita.exception;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
-import io.getarrays.securecapita.model.HttpResponse;
+import io.getarrays.securecapita.domain.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.dao.DataAccessException;
@@ -15,8 +15,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -27,63 +27,74 @@ import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 import static org.springframework.http.HttpStatus.*;
+
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 1/5/2023
+ */
+
 @RestControllerAdvice
 @Slf4j
-public class HandelException extends ResponseEntityExceptionHandler implements ErrorController {
+public class HandleException extends ResponseEntityExceptionHandler implements ErrorController {
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception exception, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
+        log.error(exception.getMessage());
         return new ResponseEntity<>(
                 HttpResponse.builder()
                         .timeStamp(now().toString())
                         .reason(exception.getMessage())
                         .developerMessage(exception.getMessage())
-                        .status(HttpStatus.resolve(statusCode.value()))
+                        .status(resolve(statusCode.value()))
                         .statusCode(statusCode.value())
-                        .build(),statusCode);
+                        .build(), statusCode);
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
+        log.error(exception.getMessage());
         List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
-        String fieldMessage = fieldErrors.stream().map(FieldError::getDefaultMessage).collect(Collectors.joining(","));
+        String fieldMessage = fieldErrors.stream().map(FieldError::getDefaultMessage).collect(Collectors.joining(", "));
         return new ResponseEntity<>(
                 HttpResponse.builder()
                         .timeStamp(now().toString())
                         .reason(fieldMessage)
                         .developerMessage(exception.getMessage())
-                        .status(HttpStatus.resolve(statusCode.value()))
+                        .status(resolve(statusCode.value()))
                         .statusCode(statusCode.value())
-                        .build(),statusCode);
+                        .build(), statusCode);
     }
 
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    protected ResponseEntity<HttpResponse> sQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException exception) {
+    public ResponseEntity<HttpResponse> sQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException exception) {
+        log.error(exception.getMessage());
         return new ResponseEntity<>(
                 HttpResponse.builder()
                         .timeStamp(now().toString())
-                        .reason(exception.getMessage().contains("Duplicate Entry")?"Information already exist": exception.getMessage())
+                        .reason(exception.getMessage().contains("Duplicate entry") ? "Information already exists" : exception.getMessage())
                         .developerMessage(exception.getMessage())
-                        .status(HttpStatus.BAD_REQUEST)
-                        .statusCode(HttpStatus.BAD_REQUEST.value())
-                        .build(),HttpStatus.BAD_REQUEST);
+                        .status(BAD_REQUEST)
+                        .statusCode(BAD_REQUEST.value())
+                        .build(), BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<HttpResponse> badCredentialsException(BadCredentialsException e) {
+    public ResponseEntity<HttpResponse> badCredentialsException(BadCredentialsException exception) {
+        log.error(exception.getMessage());
         return new ResponseEntity<>(
                 HttpResponse.builder()
                         .timeStamp(now().toString())
-                        .reason(e.getMessage() + ". It is due to bad credentials")
-                        .developerMessage(e.getMessage())
+                        .reason(exception.getMessage() + ", Incorrect email or password")
+                        .developerMessage(exception.getMessage())
                         .status(BAD_REQUEST)
                         .statusCode(BAD_REQUEST.value())
-                        .build(), BAD_REQUEST
-        );
+                        .build(), BAD_REQUEST);
     }
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<HttpResponse> apiException(ApiException exception) {
-        log.error(exception.getMessage() + "here");
+        log.error(exception.getMessage());
         return new ResponseEntity<>(
                 HttpResponse.builder()
                         .timeStamp(now().toString())
@@ -216,3 +227,24 @@ public class HandelException extends ResponseEntityExceptionHandler implements E
         return "Some error occurred";
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

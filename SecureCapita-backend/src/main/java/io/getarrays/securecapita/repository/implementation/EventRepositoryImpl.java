@@ -1,21 +1,26 @@
-package io.getarrays.securecapita.repository.impl;
+package io.getarrays.securecapita.repository.implementation;
 
+import io.getarrays.securecapita.domain.UserEvent;
 import io.getarrays.securecapita.enumeration.EventType;
-import io.getarrays.securecapita.model.UserEvent;
 import io.getarrays.securecapita.repository.EventRepository;
-import io.getarrays.securecapita.rowMapper.UserEventRowMapper;
+import io.getarrays.securecapita.rowmapper.UserEventRowMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
-import static io.getarrays.securecapita.query.EventQuery.*;
+import static io.getarrays.securecapita.query.EventQuery.INSERT_EVENT_BY_USER_EMAIL_QUERY;
+import static io.getarrays.securecapita.query.EventQuery.SELECT_EVENTS_BY_USER_ID_QUERY;
 import static java.util.Map.of;
 
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 3/21/2023
+ */
 
 @Repository
 @RequiredArgsConstructor
@@ -25,12 +30,12 @@ public class EventRepositoryImpl implements EventRepository {
 
     @Override
     public Collection<UserEvent> getEventsByUserId(Long userId) {
-        return jdbc.query(SELECT_EVENTS_BY_USER_ID_QUERY, of("id",userId),new UserEventRowMapper());
+        return jdbc.query(SELECT_EVENTS_BY_USER_ID_QUERY, of("id", userId), new UserEventRowMapper());
     }
 
     @Override
     public void addUserEvent(String email, EventType eventType, String device, String ipAddress) {
-        jdbc.update(INSERT_EVENT_BY_USER_EMAIL_QUERY,of("email",email,"type",eventType.toString(),"device",device,"ipAddress",ipAddress));
+        jdbc.update(INSERT_EVENT_BY_USER_EMAIL_QUERY, of("email", email, "type", eventType.toString(), "device", device, "ipAddress", ipAddress));
     }
 
     @Override

@@ -1,5 +1,11 @@
 package io.getarrays.securecapita.query;
 
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 8/28/2022
+ */
 public class RoleQuery {
     public static final String SELECT_ROLE_BY_NAME_QUERY = "SELECT * FROM Roles WHERE name = :name";
 
@@ -10,5 +16,4 @@ public class RoleQuery {
     public static final String SELECT_ROLES_QUERY = "SELECT * from roles order By id";
 
     public static final String UPDATE_USER_ROLE_QUERY = "UPDATE UserRoles SET role_id = :roleId WHERE user_id = :userId";
-
 }

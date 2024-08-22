@@ -4,11 +4,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
-import static io.getarrays.securecapita.constants.*;
 import static nl.basjes.parse.useragent.UserAgent.AGENT_NAME;
 import static nl.basjes.parse.useragent.UserAgent.DEVICE_NAME;
+import static nl.basjes.parse.useragent.UserAgent.OPERATING_SYSTEM_NAME;
 
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 3/21/2023
+ */
 public class RequestUtils {
+
+    public static final String USER_AGENT_HEADER = "user-agent";
+    public static final String X_FORWARDED_FOR_HEADER = "X-FORWARDED-FOR";
+
     public static String getIpAddress(HttpServletRequest request) {
         String ipAddress = "Unknown IP";
         if(request != null) {

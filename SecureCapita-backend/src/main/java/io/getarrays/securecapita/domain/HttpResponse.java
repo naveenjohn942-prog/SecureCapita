@@ -1,4 +1,4 @@
-package io.getarrays.securecapita.model;
+package io.getarrays.securecapita.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -7,9 +7,18 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
+
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 8/28/2022
+ */
+
 @Data
 @SuperBuilder
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonInclude(NON_DEFAULT)
 public class HttpResponse {
     protected String timeStamp;
     protected int statusCode;
@@ -17,5 +26,26 @@ public class HttpResponse {
     protected String reason;
     protected String message;
     protected String developerMessage;
-    protected Map<?,?> data;
+    protected Map<?, ?> data;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

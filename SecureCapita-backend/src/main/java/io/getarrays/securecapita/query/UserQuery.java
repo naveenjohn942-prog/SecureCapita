@@ -1,5 +1,11 @@
 package io.getarrays.securecapita.query;
 
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 8/28/2022
+ */
 public class UserQuery {
     public static final String COUNT_USER_EMAIL_QUERY = "SELECT COUNT(*) FROM Users WHERE email = :email";
     public static final String INSERT_USER_QUERY = "INSERT INTO Users (first_name, last_name, email, password) VALUES (:firstName, :lastName, :email, :password)";
@@ -27,3 +33,21 @@ public class UserQuery {
     public static final String UPDATE_USER_IMAGE_QUERY = "Update Users SET image_url = :imageUrl WHERE id = :id";
     public static final String UPDATE_USER_PASSWORD_BY_USER_ID_QUERY = "UPDATE Users SET password = :password WHERE id = :id";
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

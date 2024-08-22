@@ -1,11 +1,7 @@
-package io.getarrays.securecapita.model;
-
+package io.getarrays.securecapita.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,11 +9,20 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
+
+/**
+ * @author Junior RT
+ * @version 1.0
+ * @license Get Arrays, LLC (https://getarrays.io)
+ * @since 3/21/2023
+ */
+
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Data
+@JsonInclude(NON_DEFAULT)
 public class UserEvent {
     private Long id;
     private String type;
@@ -25,5 +30,4 @@ public class UserEvent {
     private String device;
     private String ipAddress;
     private LocalDateTime createdAt;
-
 }
