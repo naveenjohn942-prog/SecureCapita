@@ -53,7 +53,7 @@ import static org.springframework.web.servlet.support.ServletUriComponentsBuilde
 @RestController
 @RequestMapping(path = "/user")
 @RequiredArgsConstructor
-public class UserResource {
+public class UserController {
     private static final String TOKEN_PREFIX = "Bearer ";
     private final UserService userService;
     private final RoleService roleService;
