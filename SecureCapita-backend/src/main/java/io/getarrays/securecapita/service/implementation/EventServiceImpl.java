@@ -1,6 +1,6 @@
 package io.getarrays.securecapita.service.implementation;
 
-import io.getarrays.securecapita.domain.UserEvent;
+import io.getarrays.securecapita.model.UserEvent;
 import io.getarrays.securecapita.enumeration.EventType;
 import io.getarrays.securecapita.repository.EventRepository;
 import io.getarrays.securecapita.service.EventService;

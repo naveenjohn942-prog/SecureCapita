@@ -1,13 +1,11 @@
-package io.getarrays.securecapita.domain;
+package io.getarrays.securecapita.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 
@@ -15,7 +13,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
  * @author Junior RT
  * @version 1.0
  * @license Get Arrays, LLC (https://getarrays.io)
- * @since 3/21/2023
+ * @since 8/28/2022
  */
 
 @Data
@@ -23,11 +21,9 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(NON_DEFAULT)
-public class UserEvent {
+@Table(name = "roles")
+public class Role {
     private Long id;
-    private String type;
-    private String description;
-    private String device;
-    private String ipAddress;
-    private LocalDateTime createdAt;
+    private String name;
+    private String permissions;
 }

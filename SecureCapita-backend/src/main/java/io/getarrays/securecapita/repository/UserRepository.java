@@ -1,6 +1,6 @@
 package io.getarrays.securecapita.repository;
 
-import io.getarrays.securecapita.domain.User;
+import io.getarrays.securecapita.model.User;
 import io.getarrays.securecapita.dto.UserDTO;
 import io.getarrays.securecapita.form.UpdateForm;
 import org.springframework.web.multipart.MultipartFile;

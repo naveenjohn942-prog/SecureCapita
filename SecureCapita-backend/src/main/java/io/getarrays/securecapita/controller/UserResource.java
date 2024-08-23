@@ -1,8 +1,8 @@
-package io.getarrays.securecapita.resource;
+package io.getarrays.securecapita.controller;
 
-import io.getarrays.securecapita.domain.HttpResponse;
-import io.getarrays.securecapita.domain.User;
-import io.getarrays.securecapita.domain.UserPrincipal;
+import io.getarrays.securecapita.model.HttpResponse;
+import io.getarrays.securecapita.model.User;
+import io.getarrays.securecapita.model.UserPrincipal;
 import io.getarrays.securecapita.dto.UserDTO;
 import io.getarrays.securecapita.event.NewUserEvent;
 import io.getarrays.securecapita.exception.ApiException;

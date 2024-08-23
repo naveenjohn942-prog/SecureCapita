@@ -1,4 +1,4 @@
-package io.getarrays.securecapita.domain;
+package io.getarrays.securecapita.model;
 
 import io.getarrays.securecapita.dto.UserDTO;
 import lombok.RequiredArgsConstructor;

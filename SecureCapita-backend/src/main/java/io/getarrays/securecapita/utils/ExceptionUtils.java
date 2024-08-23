@@ -3,7 +3,7 @@ package io.getarrays.securecapita.utils;
 import com.auth0.jwt.exceptions.InvalidClaimException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.getarrays.securecapita.domain.HttpResponse;
+import io.getarrays.securecapita.model.HttpResponse;
 import io.getarrays.securecapita.exception.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

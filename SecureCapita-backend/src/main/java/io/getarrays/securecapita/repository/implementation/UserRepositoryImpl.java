@@ -1,8 +1,8 @@
 package io.getarrays.securecapita.repository.implementation;
 
-import io.getarrays.securecapita.domain.Role;
-import io.getarrays.securecapita.domain.User;
-import io.getarrays.securecapita.domain.UserPrincipal;
+import io.getarrays.securecapita.model.Role;
+import io.getarrays.securecapita.model.User;
+import io.getarrays.securecapita.model.UserPrincipal;
 import io.getarrays.securecapita.dto.UserDTO;
 import io.getarrays.securecapita.enumeration.VerificationType;
 import io.getarrays.securecapita.exception.ApiException;
@@ -24,7 +24,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;

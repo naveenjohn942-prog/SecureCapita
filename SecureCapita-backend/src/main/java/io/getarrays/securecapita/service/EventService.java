@@ -1,6 +1,6 @@
 package io.getarrays.securecapita.service;
 
-import io.getarrays.securecapita.domain.UserEvent;
+import io.getarrays.securecapita.model.UserEvent;
 import io.getarrays.securecapita.enumeration.EventType;
 
 import java.util.Collection;

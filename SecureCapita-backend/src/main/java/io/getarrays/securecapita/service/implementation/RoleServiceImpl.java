@@ -1,6 +1,6 @@
 package io.getarrays.securecapita.service.implementation;
 
-import io.getarrays.securecapita.domain.Role;
+import io.getarrays.securecapita.model.Role;
 import io.getarrays.securecapita.repository.RoleRepository;
 import io.getarrays.securecapita.service.RoleService;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package io.getarrays.securecapita.service;
 
-import io.getarrays.securecapita.domain.Role;
+import io.getarrays.securecapita.model.Role;
 
 import java.util.Collection;
 

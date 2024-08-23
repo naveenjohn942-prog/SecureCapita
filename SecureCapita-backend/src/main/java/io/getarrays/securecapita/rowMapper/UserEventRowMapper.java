@@ -1,6 +1,6 @@
 package io.getarrays.securecapita.rowmapper;
 
-import io.getarrays.securecapita.domain.UserEvent;
+import io.getarrays.securecapita.model.UserEvent;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

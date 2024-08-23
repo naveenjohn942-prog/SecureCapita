@@ -1,4 +1,4 @@
-package io.getarrays.securecapita.domain;
+package io.getarrays.securecapita.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Table;

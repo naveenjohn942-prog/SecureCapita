@@ -1,7 +1,7 @@
 package io.getarrays.securecapita.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.getarrays.securecapita.domain.HttpResponse;
+import io.getarrays.securecapita.model.HttpResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;

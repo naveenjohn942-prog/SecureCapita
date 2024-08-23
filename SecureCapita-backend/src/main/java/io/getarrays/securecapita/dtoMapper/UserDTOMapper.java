@@ -1,7 +1,7 @@
 package io.getarrays.securecapita.dtomapper;
 
-import io.getarrays.securecapita.domain.Role;
-import io.getarrays.securecapita.domain.User;
+import io.getarrays.securecapita.model.Role;
+import io.getarrays.securecapita.model.User;
 import io.getarrays.securecapita.dto.UserDTO;
 import org.springframework.beans.BeanUtils;
 
