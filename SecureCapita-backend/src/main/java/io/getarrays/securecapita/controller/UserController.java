@@ -1,15 +1,12 @@
 package io.getarrays.securecapita.controller;
 
+import io.getarrays.securecapita.form.*;
 import io.getarrays.securecapita.model.HttpResponse;
 import io.getarrays.securecapita.model.User;
 import io.getarrays.securecapita.model.UserPrincipal;
 import io.getarrays.securecapita.dto.UserDTO;
 import io.getarrays.securecapita.event.NewUserEvent;
 import io.getarrays.securecapita.exception.ApiException;
-import io.getarrays.securecapita.form.LoginForm;
-import io.getarrays.securecapita.form.SettingsForm;
-import io.getarrays.securecapita.form.UpdateForm;
-import io.getarrays.securecapita.form.UpdatePasswordForm;
 import io.getarrays.securecapita.provider.TokenProvider;
 import io.getarrays.securecapita.service.EventService;
 import io.getarrays.securecapita.service.RoleService;
@@ -79,7 +76,7 @@ public class UserController {
                 HttpResponse.builder()
                         .timeStamp(now().toString())
                         .data(of("user", userDto))
-                        .message("User created")
+                        .message(String.format("User account created for user %s",user.getFirstName()))
                         .status(CREATED)
                         .statusCode(CREATED.value())
                         .build());
@@ -142,7 +139,8 @@ public class UserController {
     }
 
     @GetMapping("/verify/password/{key}")
-    public ResponseEntity<HttpResponse> verifyPasswordUrl(@PathVariable("key") String key) {
+    public ResponseEntity<HttpResponse> verifyPasswordUrl(@PathVariable("key") String key) throws InterruptedException {
+        TimeUnit.SECONDS.sleep(3);
         UserDTO user = userService.verifyPasswordKey(key);
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
@@ -154,10 +152,10 @@ public class UserController {
                         .build());
     }
 
-    @PostMapping("/resetpassword/{key}/{password}/{confirmPassword}")
-    public ResponseEntity<HttpResponse> resetPasswordWithKey(@PathVariable("key") String key, @PathVariable("password") String password,
-                                                          @PathVariable("confirmPassword") String confirmPassword) {
-        userService.renewPassword(key, password, confirmPassword);
+    @PutMapping("/new/password")
+    public ResponseEntity<HttpResponse> resetPasswordWithKey(@RequestBody @Valid NewPasswordForm form) throws InterruptedException {
+        TimeUnit.SECONDS.sleep(3);
+        userService.updatePassword(form.getUserId(), form.getPassword(), form.getConfirmPassword());
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
                         .timeStamp(now().toString())

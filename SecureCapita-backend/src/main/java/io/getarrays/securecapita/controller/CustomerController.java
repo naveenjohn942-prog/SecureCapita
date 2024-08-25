@@ -4,20 +4,28 @@ import io.getarrays.securecapita.dto.UserDTO;
 import io.getarrays.securecapita.model.Customer;
 import io.getarrays.securecapita.model.HttpResponse;
 import io.getarrays.securecapita.model.Invoice;
+import io.getarrays.securecapita.report.CustomerReport;
 import io.getarrays.securecapita.service.CustomerService;
 import io.getarrays.securecapita.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static java.time.LocalDateTime.now;
 import static java.util.Map.of;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.parseMediaType;
 
 @RestController
 @RequestMapping(path = "/customer")
@@ -161,15 +169,15 @@ public class CustomerController {
                         .build());
     }
 
-//    @GetMapping("/download/report")
-//    public ResponseEntity<Resource> downloadReport() {
-//        List<Customer> customers = new ArrayList<>();
-//        customerService.getCustomers().iterator().forEachRemaining(customers::add);
-//        CustomerReport report = new CustomerReport(customers);
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("File-Name", "customer-report.xlsx");
-//        headers.add(CONTENT_DISPOSITION, "attachment;File-Name=customer-report.xlsx");
-//        return ResponseEntity.ok().contentType(parseMediaType("application/vnd.ms-excel"))
-//                .headers(headers).body(report.export());
-//    }
+    @GetMapping("/download/report")
+    public ResponseEntity<Resource> downloadReport() throws InterruptedException {
+        List<Customer> customers = new ArrayList<>();
+        customerService.getCustomers().iterator().forEachRemaining(customers::add);
+        CustomerReport report = new CustomerReport(customers);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("File-Name", "customer-report.xlsx");
+        headers.add(CONTENT_DISPOSITION, "attachment;File-Name=customer-report.xlsx"); //CONTENT_DISPOSITION is used to tell the browser that there is something to download
+        return ResponseEntity.ok().contentType(parseMediaType("application/vnd.ms-excel"))
+                .headers(headers).body(report.export());
+    }
 }
