@@ -94,6 +94,14 @@ export class CustomerService {
                 catchError(this.handleError)
             );
 
+    downloadInvoiceReport$ = () => <Observable<HttpEvent<Blob>>>
+    this.http.get(`${this.server}/customer/download/invoice/report`,
+        { reportProgress: true, observe: 'events', responseType: 'blob' })
+        .pipe(
+            tap(console.log),
+            catchError(this.handleError)
+        );
+
     private handleError(error: HttpErrorResponse): Observable<never> {
         console.log(error);
         let errorMessage: string;

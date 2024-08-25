@@ -5,7 +5,10 @@ import io.getarrays.securecapita.model.Customer;
 import io.getarrays.securecapita.model.HttpResponse;
 import io.getarrays.securecapita.model.Invoice;
 import io.getarrays.securecapita.report.CustomerReport;
+import io.getarrays.securecapita.report.InvoiceReport;
+import io.getarrays.securecapita.repository.InvoiceRepository;
 import io.getarrays.securecapita.service.CustomerService;
+import io.getarrays.securecapita.service.InvoiceService;
 import io.getarrays.securecapita.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -33,6 +36,7 @@ import static org.springframework.http.MediaType.parseMediaType;
 public class CustomerController {
     private final CustomerService customerService;
     private final UserService userService;
+    private final InvoiceService invoiceService;
 
     @GetMapping("/list")
     public ResponseEntity<HttpResponse> getCustomers(@AuthenticationPrincipal UserDTO user, @RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size) {
@@ -177,6 +181,18 @@ public class CustomerController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("File-Name", "customer-report.xlsx");
         headers.add(CONTENT_DISPOSITION, "attachment;File-Name=customer-report.xlsx"); //CONTENT_DISPOSITION is used to tell the browser that there is something to download
+        return ResponseEntity.ok().contentType(parseMediaType("application/vnd.ms-excel"))
+                .headers(headers).body(report.export());
+    }
+
+    @GetMapping("/download/invoice/report")
+    public ResponseEntity<Resource> downloadInvoiceReport() throws InterruptedException {
+        List<Invoice> invoices = new ArrayList<>();
+        invoiceService.getAllInvoice().iterator().forEachRemaining(invoices::add);
+        InvoiceReport report = new InvoiceReport(invoices);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("File-Name", "Invoice-report.xlsx");
+        headers.add(CONTENT_DISPOSITION, "attachment;File-Name=Invoice-report.xlsx");
         return ResponseEntity.ok().contentType(parseMediaType("application/vnd.ms-excel"))
                 .headers(headers).body(report.export());
     }

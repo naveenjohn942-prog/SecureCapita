@@ -25,6 +25,22 @@ spring:
     init:
       mode: never
       continue-on-error: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: naveenjohn942@gmail.com
+    password: yahz hzmb jhsw eiik
+
+    properties:
+      mail:
+        smtp:
+          writetimeout: 5000
+          connectiontimeout: 5000
+          timeout: 5000
+          auth: true
+          starttls:
+            enable: true
+            required: true
 management:
   endpoints:
     web:
