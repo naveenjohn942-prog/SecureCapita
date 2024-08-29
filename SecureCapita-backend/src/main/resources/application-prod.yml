@@ -28,8 +28,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: naveenjohn942@gmail.com
-    password: yahz hzmb jhsw eiik
+    username: <Your emai>
+    password: <app code>
 
     properties:
       mail:
