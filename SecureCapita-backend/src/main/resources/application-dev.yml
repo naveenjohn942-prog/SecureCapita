@@ -10,9 +10,6 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/securecapita
     username: root
     password: root
-#    url: jdbc:mysql://database-1.cfvyv9shl5s3.us-east-1.rds.amazonaws.com/securecapita
-#    username: admin
-#    password: securecapita123
   jpa:
     database-platform: org.hibernate.dialect.MySQL8InnoDBDialect
     generate-ddl: true
